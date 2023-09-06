@@ -6,6 +6,7 @@ import Membro from './components/Membro';
 import Render from './Render';
 import Lista from './Lista';
 import Forms from './Forms';
+import Form2 from './Form2';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -17,6 +18,7 @@ root.render(
     <Render />
     <Lista />
     <Forms />
+    <Form2 />
   </React.StrictMode>
 );
 
