@@ -7,6 +7,7 @@ import Render from './Render';
 import Lista from './Lista';
 import Forms from './Forms';
 import Form2 from './Form2';
+import Forms2 from './Forms2';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -19,6 +20,7 @@ root.render(
     <Lista />
     <Forms />
     <Form2 />
+    <Forms2 />
   </React.StrictMode>
 );
 
