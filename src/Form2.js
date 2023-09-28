@@ -30,7 +30,7 @@ class App extends Component {
     render() {
         return (
             <div>
-                <h1>Continucao do forms</h1>
+                <h1>Continuação do forms</h1>
                 <p>{this.state.error}</p>
                 <form onSubmit={this.cadastrar}>
                     <label>Nome:</label>
@@ -52,6 +52,8 @@ class App extends Component {
                     <h3>{this.state.senha}</h3>
                 </div>
 
+                <br />
+                <hr />
             </div>
         )
     }

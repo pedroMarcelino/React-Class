@@ -8,6 +8,12 @@ import Lista from './Lista';
 import Forms from './Forms';
 import Form2 from './Form2';
 import Forms2 from './Forms2';
+import Biscoito from './Biscoito';
+import Cronometro from './Cronometro';
+import Hooks from './Hooks';
+import Rotas from './Rotas';
+import Caminho from './Caminho';
+
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -21,6 +27,11 @@ root.render(
     <Forms />
     <Form2 />
     <Forms2 />
+    <Biscoito />
+    <Cronometro/>
+    <Hooks />
+    <Rotas />
+    <Caminho/>
   </React.StrictMode>
 );
 
