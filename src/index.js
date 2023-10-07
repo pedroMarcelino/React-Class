@@ -13,6 +13,7 @@ import Cronometro from './Cronometro';
 import Hooks from './Hooks';
 import Rotas from './Rotas';
 import Caminho from './Caminho';
+import FireApp from './FireApp';
 
 
 
@@ -32,6 +33,7 @@ root.render(
     <Hooks />
     <Rotas />
     <Caminho/>
+    <FireApp />
   </React.StrictMode>
 );
 
