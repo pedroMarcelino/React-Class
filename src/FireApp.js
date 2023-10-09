@@ -1,123 +1,186 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { db } from "./FireConnect";
-import { addDoc, collection, doc, getDoc, setDoc, getDocs, updateDoc} from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, setDoc, getDocs, updateDoc, deleteDoc, onSnapshot} from "firebase/firestore";
 
-
-function FireApp(){
+function App() {
     const [titulo, setTitulo] = useState('');
     const [autor, setAutor] = useState('');
-    const [idPost, setIdPost ] = useState('');
+    const [idPost, setIdPost] = useState('')
+  
+    const [posts, setPosts] = useState([]);
 
-    const [posts, setPosts] = useState([])
 
-    async function handleAdd(){
-        // await setDoc(doc(db, 'posts', "12345"), {
-        //     titulo: titulo,
-        //     autor: autor,
-        // })
-        // .then(()=>{
-        //     console.log('dados registrados');
-        // })
-        // .catch((error)=>{
-        //     console.log('dados nao registrados');
-        // })
-
-        await addDoc(collection(db, 'posts'), {
-            titulo: titulo,
-            autor: autor,
+    useEffect(()=>{
+        async function loadPost(){
+            onSnapshot(collection(db, 'posts'), (snapshot)=>{
+                let lista = [];
+  
+        snapshot.forEach((doc) => {
+          lista.push({
+            id: doc.id,
+            titulo: doc.data().titulo,
+            autor: doc.data().autor,
+          })
         })
-        .then(()=>{
-            console.log('dados registrados');
-            setTitulo('');
-            setAutor('');
-        })
-        .catch((error)=>{
-            console.log('dados nao registrados');
-        })
-    }
-
-    async function buscarItem(){
-        //BUSCAMOS POSTS UNICOS ABAIXO
-
-        // await getDoc(doc(db, 'posts', '12345'))
-        // .then((snapshot)=>{
-        //     setTitulo(snapshot.data().titulo);
-        //     setAutor(snapshot.data().autor);
-        // })
-        // .catch((error)=>{
-        //     console.log('dados nao registrados');
-        // })
-
-        const postRef = collection(db, 'posts')
-        await getDocs(postRef)
-        .then((snapshot)=>{
-            let lista = [];
-
-            snapshot.forEach((doc)=>{
-                lista.push({
-                    id: doc.id,
-                    titulo: doc.data().titulo,
-                    autor: doc.data().autor,
-                })
+  
+        setPosts(lista);
             })
+        }
 
-            setPosts(lista)
-            console.log(lista);
+        loadPost();
+    }, [])
+  
+    async function handleAdd(){
+      // await setDoc(doc(db, "posts", "12345"), {
+      //   titulo: titulo,
+      //   autor: autor,
+      // })
+      // .then(() => {
+      //   console.log("DADOS REGISTRADO NO BANCO!")
+      // })
+      // .catch((error) => {
+      //   console.log("GEROU ERRO" + error)
+      // }) 
+  
+  
+      await addDoc(collection(db, "posts"), {
+        titulo: titulo,
+        autor: autor,
+      })
+      .then(() => {
+        console.log("CADASTRADO COM SUCESSO")
+        setAutor('');
+        setTitulo('')
+      })
+      .catch((error) => {
+        console.log("ERRO " + error)
+      })
+  
+  
+    }
+  
+  
+    async function buscarPost(){
+      // const postRef = doc(db, "posts", "vFvZAyFqebXFsFv0X89l")
+      // await getDoc(postRef)
+      // .then((snapshot) => {
+      //   setAutor(snapshot.data().autor)
+      //   setTitulo(snapshot.data().titulo)
+  
+      // })
+      // .catch(()=>{
+      //   console.log("ERRO AO BUSCAR")
+      // })
+  
+      const postsRef = collection(db, "posts")
+      await getDocs(postsRef)
+      .then((snapshot) => {
+        let lista = [];
+  
+        snapshot.forEach((doc) => {
+          lista.push({
+            id: doc.id,
+            titulo: doc.data().titulo,
+            autor: doc.data().autor,
+          })
         })
-        .catch((e)=>{
-            console.log(e);
-        })
-        
+  
+        setPosts(lista);
+  
+      })
+      .catch((error) => {
+        console.log("DEU ALGUM ERRO AO BUSCAR")
+      })
+  
+  
+    }
+  
+  
+    async function editarPost(){
+      const docRef = doc(db, "posts", idPost)
+      
+      await updateDoc(docRef, {
+        titulo: titulo,
+        autor: autor
+      })
+      .then(() => {
+        console.log("POST ATUALIZADO!")
+        setIdPost('')
+        setTitulo('')
+        setAutor('')
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  
+  
     }
 
-    async function autalizar(){
-        const docRef = doc(db, 'posts', idPost)
-        await updateDoc(docRef, {
-            titulo: titulo,
-            autor: autor,
+    async function excluirPost(id){
+        const docRef = doc(db, 'posts', id)
+
+        await deleteDoc(docRef)
+        .then(()=>{
+            console.log('Deletado com secesso');
         })
-        .then((snapshot)=>{
-            console.log('atualizado com sucesso');
-            setAutor('')
-            setTitulo('')
-            setIdPost('')
-        })
-        .catch((e)=>{
-            console.log(e);
-        })
+        .catch((error) => {
+            console.log(error)
+          })
     }
-
-    return(
-        <div className="fireapp">
-            <h1>ReactJS + Firebase</h1>
-            <div className="container">
-                <label htmlFor="id">Insira o id:</label>
-                <input type="text" name="id" id="id" onChange={ (e) => {setIdPost(e.target.value)} } />
-
-                <label htmlFor="titulo">Titulo:</label>
-                <textarea name="titulo" id="titulo" cols="30" rows="10" value={titulo} onChange={ (e) => {setTitulo(e.target.value)} }></textarea>
-                <label htmlFor="autor">Autor:</label>
-                <input type="text" name="autor" id="autor" value={autor} onChange={ (e) => {setAutor(e.target.value)} } />
-                <button onClick={handleAdd}>Cadastras</button>
-                <button onClick={buscarItem}>Buscar item</button>
-                <button onClick={autalizar}>Atualizar</button>
-
-                <ul>
-                    {
-                        posts.map((item) => {
-                            return(
-                                <li key={item.id}>
-                                    <span>{item.id}</span><br />
-                                    <span>{item.titulo}</span><br />
-                                    <span>{item.autor}</span><br /><br />   
-                                </li>
-                            )
-                        })
-                    }
-                </ul>
-            </div>
-        </div>
-    )
-}
-
-export default FireApp;
+  
+    return (
+      <div>
+        <h1>ReactJS + Firebase :)</h1>
+  
+      <div className="container">
+  
+        <label>ID do Post:</label>
+        <input
+          placeholder='Digite o ID do post'
+          value={idPost}
+          onChange={ (e) => setIdPost(e.target.value) }
+        /> <br/>
+  
+        <label>Titulo:</label>
+        <textarea 
+          type="text"
+          placeholder='Digite o titulo'
+          value={titulo}
+          onChange={ (e) => setTitulo(e.target.value) }
+        />
+  
+        <label>Autor:</label>
+        <input 
+          type="text" 
+          placeholder="Autor do post"
+          value={autor}
+          onChange={(e) => setAutor(e.target.value) }
+        />
+  
+        <button onClick={handleAdd}>Cadastrar</button>
+        <button onClick={buscarPost}>Buscar post</button> <br/>
+  
+        <button onClick={editarPost}>Atualizar post</button>
+  
+  
+        <ul>
+          {posts.map( (post) => {
+            return(
+              <li key={post.id}>
+                <strong>ID: {post.id}</strong> <br/>
+                <span>Titulo: {post.titulo} </span> <br/>
+                <span>Autor: {post.autor}</span> <br/>  <br/>
+                <button onClick={() => {excluirPost(post.id)}}>Excluir Post</button>
+              </li>
+            )
+          })}
+        </ul>
+  
+      </div>
+  
+      </div>
+    );
+  }
+  
+  export default App;
+  
